@@ -1,0 +1,52 @@
+name: Outskirts Swift Dead Code Scan
+description: Find unused Swift code with outskirts (a maintained fork of Periphery) and report it as annotations.
+author: tiny-earth-moon
+branding:
+  icon: scissors
+  color: orange
+inputs:
+  version:
+    description: outskirts version to install (`latest`, `3.20.0` or `v3.20.0`).
+    required: false
+    default: latest
+  args:
+    description: Extra arguments passed to `outskirts scan` (split on whitespace).
+    required: false
+    default: ""
+  working-directory:
+    description: Directory the scan runs in.
+    required: false
+    default: "."
+  format:
+    description: Output format (`--format`). `github-actions` emits annotations.
+    required: false
+    default: github-actions
+  fail-on-results:
+    description: "`true`: pass `--strict`, the step fails when results are reported. `false`: never fail on results, only on real errors."
+    required: false
+    default: "true"
+  github-token:
+    description: Token used to resolve the latest release.
+    required: false
+    default: ${{ github.token }}
+outputs:
+  version:
+    description: Installed outskirts version.
+    value: ${{ steps.install.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - id: install
+      shell: bash
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: '"$GITHUB_ACTION_PATH/scripts/install.sh"'
+    - id: scan
+      shell: bash
+      env:
+        INPUT_ARGS: ${{ inputs.args }}
+        INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
+        INPUT_FORMAT: ${{ inputs.format }}
+        INPUT_FAIL_ON_RESULTS: ${{ inputs.fail-on-results }}
+      run: '"$GITHUB_ACTION_PATH/scripts/scan.sh"'

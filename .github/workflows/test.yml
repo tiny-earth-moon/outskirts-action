@@ -1,0 +1,60 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  reports-results:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - id: scan
+        uses: ./
+        with:
+          working-directory: example
+          fail-on-results: "false"
+          format: xcode
+      - name: Unused declaration is reported
+        run: |
+          cd example
+          outskirts scan --format xcode | tee scan.log
+          grep -q "unusedHelper" scan.log
+      - name: Output version is set
+        env:
+          VERSION: ${{ steps.scan.outputs.version }}
+        run: test -n "$VERSION"
+
+  fails-on-results:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - id: scan
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: example
+      - name: Step failed because of results
+        env:
+          OUTCOME: ${{ steps.scan.outcome }}
+        run: test "$OUTCOME" = "failure"
+
+  pinned-version:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - id: scan
+        uses: ./
+        with:
+          version: v3.20.0
+          working-directory: example
+          fail-on-results: "false"
+      - name: Pinned version installed
+        env:
+          VERSION: ${{ steps.scan.outputs.version }}
+        run: |
+          test "$VERSION" = "3.20.0"
+          outskirts version | grep -q "3.20.0"
