@@ -33,6 +33,22 @@ if [[ -z "$expected" || "$expected" != "$actual" ]]; then
   exit 1
 fi
 
+# Releases from 3.22.0 carry a build provenance attestation: the archive must have been built by the release
+# workflow of the outskirts repository. Older releases have none and are only checked against their checksum.
+first_attested="3.22.0"
+if [[ "${INPUT_VERIFY_ATTESTATION:-true}" != "true" ]]; then
+  echo "Attestation check skipped (verify-attestation: false)"
+elif [[ "$(printf '%s\n%s\n' "$first_attested" "$version" | sort -V | head -n 1)" != "$first_attested" ]]; then
+  echo "::notice::outskirts ${version} predates build provenance attestations (${first_attested}); only the checksum was verified."
+elif ! gh attestation verify "${name}.tar.gz" -R "$repo" \
+  --signer-workflow "${repo}/.github/workflows/bottle.yml" > attestation.log 2>&1; then
+  cat attestation.log
+  echo "::error::Build provenance attestation of ${name}.tar.gz could not be verified. Set verify-attestation: false to skip this check."
+  exit 1
+else
+  echo "Build provenance attestation verified"
+fi
+
 tar xzf "${name}.tar.gz"
 bin="${dest}/${name}"
 "${bin}/outskirts" version

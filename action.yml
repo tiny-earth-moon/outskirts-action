@@ -25,8 +25,12 @@ inputs:
     description: "`true`: pass `--strict`, the step fails when results are reported. `false`: never fail on results, only on real errors."
     required: false
     default: "true"
+  verify-attestation:
+    description: "`true`: verify the build provenance attestation of the downloaded archive (outskirts 3.22.0 and later). `false`: checksum only."
+    required: false
+    default: "true"
   github-token:
-    description: Token used to resolve the latest release.
+    description: Token used to resolve the latest release and to verify the attestation.
     required: false
     default: ${{ github.token }}
 outputs:
@@ -40,6 +44,7 @@ runs:
       shell: bash
       env:
         INPUT_VERSION: ${{ inputs.version }}
+        INPUT_VERIFY_ATTESTATION: ${{ inputs.verify-attestation }}
         GH_TOKEN: ${{ inputs.github-token }}
       run: '"$GITHUB_ACTION_PATH/scripts/install.sh"'
     - id: scan
