@@ -11,7 +11,7 @@ jobs:
   reports-results:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: scan
         uses: ./
         with:
@@ -31,7 +31,7 @@ jobs:
   fails-on-results:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: scan
         continue-on-error: true
         uses: ./
@@ -45,7 +45,7 @@ jobs:
   pinned-version:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: scan
         uses: ./
         with:
@@ -58,3 +58,18 @@ jobs:
         run: |
           test "$VERSION" = "3.20.0"
           outskirts version | grep -q "3.20.0"
+
+  attested-version:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: scan
+        uses: ./
+        with:
+          version: 3.23.0
+          working-directory: example
+          fail-on-results: "false"
+      - name: Attested version installed
+        env:
+          VERSION: ${{ steps.scan.outputs.version }}
+        run: test "$VERSION" = "3.23.0"
