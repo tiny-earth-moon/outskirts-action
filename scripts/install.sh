@@ -8,8 +8,16 @@ if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
   exit 1
 fi
 
+require_gh() {
+  if ! command -v gh > /dev/null 2>&1; then
+    echo "::error::The GitHub CLI (gh) is not installed on this runner; it is needed $1. Install gh, or $2."
+    exit 1
+  fi
+}
+
 version="${INPUT_VERSION:-latest}"
 if [[ "$version" == "latest" ]]; then
+  require_gh "to resolve version: latest" "set version to an exact release"
   version="$(gh release view -R "$repo" --json tagName -q .tagName)"
 fi
 version="${version#v}"
@@ -40,12 +48,14 @@ if [[ "${INPUT_VERIFY_ATTESTATION:-true}" != "true" ]]; then
   echo "Attestation check skipped (verify-attestation: false)"
 elif [[ "$(printf '%s\n%s\n' "$first_attested" "$version" | sort -V | head -n 1)" != "$first_attested" ]]; then
   echo "::notice::outskirts ${version} predates build provenance attestations (${first_attested}); only the checksum was verified."
-elif ! gh attestation verify "${name}.tar.gz" -R "$repo" \
-  --signer-workflow "${repo}/.github/workflows/bottle.yml" > attestation.log 2>&1; then
-  cat attestation.log
-  echo "::error::Build provenance attestation of ${name}.tar.gz could not be verified. Set verify-attestation: false to skip this check."
-  exit 1
 else
+  require_gh "to verify the build provenance attestation" "set verify-attestation: false to skip that check"
+  if ! gh attestation verify "${name}.tar.gz" -R "$repo" \
+    --signer-workflow "${repo}/.github/workflows/bottle.yml" > attestation.log 2>&1; then
+    cat attestation.log
+    echo "::error::Build provenance attestation of ${name}.tar.gz could not be verified. Set verify-attestation: false to skip this check."
+    exit 1
+  fi
   echo "Build provenance attestation verified"
 fi
 

@@ -14,6 +14,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Argument handling under the system bash
         run: /bin/bash scripts/test-scan-args.sh
+      - name: Offline install checks under the system bash
+        run: /bin/bash scripts/test-install.sh
 
   readme-pin:
     runs-on: macos-15
