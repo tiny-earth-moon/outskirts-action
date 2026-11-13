@@ -52,7 +52,7 @@ A `.outskirts.yml` (or `.periphery.yml`) in the working directory is picked up a
 `@v1` follows the latest compatible release of this action. For reproducible builds, pin the action to a full commit SHA and set `version` to an exact outskirts release, so a new scanner release cannot change your results unexpectedly:
 
 ```yaml
-      - uses: tiny-earth-moon/outskirts-action@591df5739c4bf1a6a9896b03e8dbec86950dd8c5 # v1.0.0
+      - uses: tiny-earth-moon/outskirts-action@ca927cb20581e1f9a4cd92ef34311d0a99aed0bd # v1.1.0
         with:
           version: 3.23.0
 ```
