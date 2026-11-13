@@ -8,6 +8,13 @@ permissions:
   contents: read
 
 jobs:
+  scan-args:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Argument handling under the system bash
+        run: /bin/bash scripts/test-scan-args.sh
+
   reports-results:
     runs-on: macos-15
     steps:
