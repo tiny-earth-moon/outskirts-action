@@ -66,6 +66,12 @@ run "attested install" 0 "Build provenance attestation verified"
 run "latest resolved with gh" 0 "Installed outskirts 3.23.0" INPUT_VERSION=latest
 run "attestation failure" 1 "::error::Build provenance attestation" FAKE_ATTESTATION=bad
 run "skipped attestation" 0 "Attestation check skipped" INPUT_VERIFY_ATTESTATION=false
+run "arm64 under Rosetta" 0 "Installed outskirts 3.23.0" FAKE_MACHINE=x86_64
+run "Intel machine" 1 "::error::outskirts-action needs a macOS arm64 runner" FAKE_MACHINE=x86_64 FAKE_HW_ARM64=0
+run "curl restricted to HTTPS" 0 "Installed"
+if [[ $(grep -c -- "--proto =https --tlsv1.2" "$tmp/runner/curl.log") != 2 ]]; then
+  echo "FAIL curl is not restricted to HTTPS and TLS 1.2"; failures=$((failures + 1))
+fi
 
 gh_dir="$tmp/no-gh"
 run "latest without gh" 1 "::error::The GitHub CLI (gh) is not installed.*resolve version: latest" INPUT_VERSION=latest
