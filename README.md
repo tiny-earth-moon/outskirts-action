@@ -34,10 +34,10 @@ A `.outskirts.yml` (or `.periphery.yml`) in the working directory is picked up a
 | Name | Default | Description |
 |------|---------|-------------|
 | `version` | `latest` | outskirts version: `latest`, `3.20.0` or `v3.20.0`. |
-| `args` | `""` | Extra arguments for `outskirts scan`, split on whitespace. |
+| `args` | `""` | Extra arguments for `outskirts scan`, split on spaces, tabs and newlines (one or several lines). Single or double quotes keep a value with spaces together (`--schemes "My App"`); there are no escapes, and the text is never evaluated by a shell (`$(...)`, `;`, `*` stay literal). An unterminated quote is an error. |
 | `working-directory` | `.` | Directory the scan runs in. |
 | `format` | `github-actions` | `--format` value; `github-actions` emits annotations. |
-| `fail-on-results` | `true` | `true` passes `--strict`: the step fails when results are reported. `false` never fails on results, only on real errors (build failure, bad configuration). |
+| `fail-on-results` | `true` | `true` passes `--strict`: the step fails when results are reported. `false` passes `--no-strict`, which overrides `strict: true` in the configuration file, and never fails on results, only on real errors (build failure, bad configuration). |
 | `verify-attestation` | `true` | Verify the build provenance attestation of the archive (outskirts 3.22.0 and later; older releases are checked against their checksum only). |
 | `github-token` | `${{ github.token }}` | Token used to resolve `latest` and to verify the attestation. |
 

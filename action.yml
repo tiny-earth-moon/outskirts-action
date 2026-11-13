@@ -10,7 +10,7 @@ inputs:
     required: false
     default: latest
   args:
-    description: Extra arguments passed to `outskirts scan` (split on whitespace).
+    description: Extra arguments passed to `outskirts scan`, split on spaces and newlines; single or double quotes keep a value with spaces together. Never evaluated by a shell.
     required: false
     default: ""
   working-directory:
@@ -22,7 +22,7 @@ inputs:
     required: false
     default: github-actions
   fail-on-results:
-    description: "`true`: pass `--strict`, the step fails when results are reported. `false`: never fail on results, only on real errors."
+    description: "`true`: pass `--strict`, the step fails when results are reported. `false`: pass `--no-strict` (overrides `strict: true` in the configuration file), never fail on results, only on real errors."
     required: false
     default: "true"
   verify-attestation:
