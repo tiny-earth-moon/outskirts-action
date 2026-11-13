@@ -6,7 +6,7 @@ cd "${INPUT_WORKING_DIRECTORY:-.}"
 cmd=(outskirts scan --format "${INPUT_FORMAT:-github-actions}")
 case "${INPUT_FAIL_ON_RESULTS:-true}" in
   true) cmd+=(--strict) ;;
-  false) ;;
+  false) cmd+=(--no-strict) ;;
   *) echo "::error::fail-on-results must be 'true' or 'false'"; exit 1 ;;
 esac
 
